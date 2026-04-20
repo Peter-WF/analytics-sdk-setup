@@ -57,32 +57,6 @@ npx skills list -a claude-code
 npx skills add ./analytics-sdk-setup -g -a claude-code
 ```
 
-### 其他常用 `skills` 命令
-
-```bash
-# 列出已安装 skills
-npx skills list
-
-# 搜索 skills
-npx skills find analytics
-
-# 检查更新
-npx skills check
-
-# 更新已安装 skills
-npx skills update
-
-# 删除 skill
-npx skills remove analytics-sdk-setup -a claude-code
-```
-
-### 安装说明
-
-- CLI 支持本地路径、GitHub 简写、完整 GitHub URL、GitLab URL 以及通用 git URL。
-- 交互式安装时，可以选择 **Symlink** 或 **Copy**。
-- 默认更推荐 **Symlink**，因为它保留单一 source of truth，后续更易更新。
-- 如果你的环境不支持软链接，再使用 `--copy`。
-
 ## 这个 skill 能做什么
 
 这个 skill 面向需要在真实仓库里处理 tracking 代码的编码代理。
@@ -135,6 +109,8 @@ analytics-sdk-setup/
 ├── SKILL.zh-CN.md
 ├── agent-system-prompt.md
 ├── agent-system-prompt.zh-CN.md
+├── evals/
+│   └── evals.json
 └── references/
     ├── install-and-events.md
     ├── install-and-events.zh-CN.md
@@ -146,6 +122,7 @@ analytics-sdk-setup/
 
 - `SKILL.md` —— 规范主文档
 - `agent-system-prompt.md` —— 面向单一 prompt block 环境的紧凑运行时摘要
+- `evals/evals.json` —— 用于执行模式与触发行为回归检查的轻量提示词集合
 - `references/install-and-events.md` —— bootstrap placement、事件映射、payload 和验证
 - `references/privacy-and-csp.md` —— consent、CSP、LDU、Advanced Matching / PII 护栏
 - `*.zh-CN.md` —— 方便审查和团队推广的中文 companion 文件
@@ -188,6 +165,47 @@ analytics-sdk-setup/
 - 修复某个 app shell 里的重复初始化
 - 在已知成功点增加一个明确事件
 - 审查某次改动是否真的需要调整 CSP
+
+## 快速操作示例
+
+这些示例适合用来检查 skill 是否在正确场景下被触发。
+
+### 审计与对账
+用户提示词：
+> Compare TikTok and Meta tracking in this repo and tell me where they drift.
+
+预期第一步：
+- 先判断执行模式
+- 在提出改动前先检查 repo ownership、共享 bootstrap 和事件漂移
+
+### 狭窄的重复初始化修复
+用户提示词：
+> Fix the duplicate Pixel initialization in our checkout app shell, but do not change unrelated tracking.
+
+预期第一步：
+- 只有在 ownership 和隐私 blocker 都清晰时才进入 direct implementation
+- 保持修复局部化，避免做 broad refactor
+
+### Questions-first 隐私 blocker
+用户提示词：
+> Add TikTok + Meta Purchase tracking, but I am not sure whether consent gating or Pixel IDs are already configured.
+
+预期第一步：
+- 切换到 questions-first
+- 只问最少的阻塞性问题，而不是编造 ID 或隐私行为
+
+## 快速验证流程
+
+安装后，可以用下面的轻量方式验证 skill：
+
+1. 先确认 skill 已安装：
+   ```bash
+   npx skills list -a claude-code
+   ```
+2. 用一个 audit prompt 和一个 blocker 较多的 prompt 分别触发它。
+3. 检查第一轮输出是否明确选择了 `Mode A`、`Mode B` 或 `Mode C`。
+4. 检查 plan/questions 模式是否没有直接跳进 patch。
+5. 检查输出是否保持隐私保守，并在两个平台都在范围内时把 TikTok + Meta 当作共享治理问题处理。
 
 ## 安全与验证说明
 

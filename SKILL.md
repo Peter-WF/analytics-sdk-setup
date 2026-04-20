@@ -1,11 +1,13 @@
 ---
 name: analytics-sdk-setup
-description: Use this skill to audit, install, compare, align, or fix TikTok Pixel and Meta Pixel integrations with clear execution-mode decisions, cross-platform governance rules, and privacy-safe defaults for coding agents.
+description: Use this skill whenever a user wants a coding agent to audit, install, reconcile, align, or fix TikTok Pixel and/or Meta Pixel code in a real repo — especially for duplicate init, tracking drift, event mapping, consent/CSP/LDU/privacy gating, or unclear analytics ownership.
 ---
 
 # Analytics SDK Setup
 
-Use this skill when the user wants a coding agent to inspect, install, compare, align, or fix TikTok Pixel and Meta Pixel tracking in a real codebase.
+Use this skill when the user wants a coding agent to inspect, install, compare, align, reconcile, or fix TikTok Pixel and Meta Pixel tracking in a real codebase.
+
+Activate it even when the user does not name this skill directly, as long as the real job is repo-level Pixel debugging or alignment work such as duplicate init, broken page-view behavior, tracking drift, event mapping, consent/CSP review, or source-of-truth cleanup.
 
 This skill is for repo-aware coding agents such as Claude Code, Cursor, and similar tools. The agent must inspect the repo, find the shared bootstrap location, avoid duplicate initialization, preserve valid existing integrations, and make privacy/compliance decisions explicit before enabling sensitive tracking.
 
@@ -71,14 +73,16 @@ Quick fix mode does not bypass the output contract. Keep required sections for t
 
 Activate when the user asks for any of the following:
 - install or fix TikTok Pixel or Meta Pixel
-- align TikTok and Meta event tracking
-- compare TikTok and Meta implementations in a codebase
-- investigate duplicate Pixel initialization
+- align, reconcile, or compare TikTok and Meta event tracking
+- investigate duplicate Pixel initialization, broken page-view behavior, or tracking drift
 - configure event mapping, parameter mapping, deduplication, or Advanced Matching
 - review CSP, LDU, consent, or PII-related constraints
 - audit whether the existing analytics integration is correct
+- clean up analytics ownership or source of truth in a repo
 - have a coding agent such as Cursor or Claude Code directly implement or debug Pixel integration
 - produce a governance or reconciliation recommendation for TikTok and Meta tracking
+
+This should still activate when the user never says "analytics-sdk-setup" but clearly needs repo-aware Pixel inspection, repair, or alignment.
 
 ## When not to activate
 

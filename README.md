@@ -57,32 +57,6 @@ Example global install:
 npx skills add ./analytics-sdk-setup -g -a claude-code
 ```
 
-### Other useful `skills` commands
-
-```bash
-# List installed skills
-npx skills list
-
-# Search for skills
-npx skills find analytics
-
-# Check for updates
-npx skills check
-
-# Update installed skills
-npx skills update
-
-# Remove a skill
-npx skills remove analytics-sdk-setup -a claude-code
-```
-
-### Installation notes
-
-- The CLI supports local paths, GitHub shorthand, full GitHub URLs, GitLab URLs, and generic git URLs.
-- Interactive installs can use **Symlink** or **Copy** mode.
-- **Symlink** is the recommended default because it keeps a canonical source of truth.
-- Use `--copy` if symlinks are not supported in your environment.
-
 ## What this skill does
 
 This skill is designed for coding agents that need to work on tracking code inside a real repository.
@@ -135,6 +109,8 @@ analytics-sdk-setup/
 ├── SKILL.zh-CN.md
 ├── agent-system-prompt.md
 ├── agent-system-prompt.zh-CN.md
+├── evals/
+│   └── evals.json
 └── references/
     ├── install-and-events.md
     ├── install-and-events.zh-CN.md
@@ -146,6 +122,7 @@ analytics-sdk-setup/
 
 - `SKILL.md` — canonical skill spec
 - `agent-system-prompt.md` — compact runtime summary for environments that want a single prompt block
+- `evals/evals.json` — lightweight regression prompts for mode selection and trigger behavior
 - `references/install-and-events.md` — bootstrap placement, event mapping, payloads, and verification
 - `references/privacy-and-csp.md` — consent, CSP, LDU, Advanced Matching / PII guardrails
 - `*.zh-CN.md` — Chinese companion versions for review and team adoption
@@ -188,6 +165,47 @@ You can also use it for narrower requests such as:
 - fixing duplicate init in one app shell
 - adding one concrete event at a known success point
 - reviewing whether CSP changes are really required
+
+## Quick operational examples
+
+These examples are useful for checking whether the skill activates in the right situations.
+
+### Audit and reconciliation
+User prompt:
+> Compare TikTok and Meta tracking in this repo and tell me where they drift.
+
+Expected first move:
+- classify execution mode first
+- inspect repo ownership, shared bootstrap, and event drift before suggesting edits
+
+### Narrow duplicate-init repair
+User prompt:
+> Fix the duplicate Pixel initialization in our checkout app shell, but do not change unrelated tracking.
+
+Expected first move:
+- choose direct implementation only if ownership and privacy blockers are already clear
+- keep the fix localized and avoid broad refactors
+
+### Questions-first privacy blocker
+User prompt:
+> Add TikTok + Meta Purchase tracking, but I am not sure whether consent gating or Pixel IDs are already configured.
+
+Expected first move:
+- switch to questions-first
+- ask only the minimum blocking questions instead of inventing IDs or privacy behavior
+
+## Quick validation flow
+
+After installation, validate the skill in a lightweight way:
+
+1. Confirm the skill is installed:
+   ```bash
+   npx skills list -a claude-code
+   ```
+2. Trigger it with one audit prompt and one blocker-heavy prompt.
+3. Check that the first response explicitly chooses `Mode A`, `Mode B`, or `Mode C`.
+4. Check that plan/questions modes do not jump straight into patches.
+5. Check that the response stays privacy-conservative and treats TikTok + Meta as a shared governance problem when both are in scope.
 
 ## Safety and verification notes
 
